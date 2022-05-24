@@ -320,7 +320,7 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0
 std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell ); // new in 1.8.0
 
-void register_fibre_voxels( Cell* pCell ); // PhysiMESS
+std::list<int> register_fibre_voxels( Cell* pCell ); // PhysiMESS
 void deregister_fibre_voxels( Cell* pCell ); // PhysiMESS
 std::list<int> find_agent_voxels(Cell * pCell ); // PhysiMESS
 void find_agent_neighbors( Cell* pCell ); // PhysiMESS

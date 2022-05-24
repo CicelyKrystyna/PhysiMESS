@@ -3684,13 +3684,18 @@ int find_cell_definition_index( int search_type )
 	return -1; 
 }
 
-void register_fibre_voxels(Cell *pCell) {
+std::list<int> register_fibre_voxels(Cell *pCell) {
+
+    std::list<int> agent_voxels;
+    int voxel;
 
     //only do this for fibres
-    if (pCell->type_name != "fibre") { return;}
+    if (pCell->type_name != "fibre") {
+        voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
+        agent_voxels.push_back(voxel);
+    }
 
     if (pCell->type_name == "fibre") {
-        int voxel;
         int voxel_size = 30; // note this must be the same as the mechanics_voxel_size
         int test = 2.0 * pCell->parameters.mLength / voxel_size; //allows us to sample along the fibre
 
@@ -3702,12 +3707,12 @@ void register_fibre_voxels(Cell *pCell) {
         }
         // first add the voxel of the fibre end point
         voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(fibre_end);
+        agent_voxels.push_back(voxel);
         if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                       pCell->get_container()->agent_grid[voxel].end(),
                       pCell) == pCell->get_container()->agent_grid[voxel].end()) {
                 pCell->get_container()->agent_grid[voxel].push_back(pCell);
         }
-
         // then walk along the fibre from fibre start point sampling and adding voxels as we go
         std::vector<double> point_on_fibre(3, 0.0);
         for (unsigned int j = 0; j < test + 1; j++) {
@@ -3715,14 +3720,19 @@ void register_fibre_voxels(Cell *pCell) {
                 point_on_fibre[i] = fibre_start[i] + j * voxel_size * pCell->state.orientation[i];
             }
             voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(point_on_fibre);
-
+            agent_voxels.push_back(voxel);
             if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                           pCell->get_container()->agent_grid[voxel].end(),
                           pCell) == pCell->get_container()->agent_grid[voxel].end()) {
                 pCell->get_container()->agent_grid[voxel].push_back(pCell);
             }
         }
+
+        agent_voxels.sort();
+        agent_voxels.unique();
     }
+
+    return agent_voxels;
 }
 
 void deregister_fibre_voxels(Cell *pCell) {
@@ -3731,34 +3741,12 @@ void deregister_fibre_voxels(Cell *pCell) {
     if (pCell->type_name != "fibre") { return;}
 
     if (pCell->type_name == "fibre") {
-        int voxel;
-        int centre_voxel;
-        int end_voxel;
-        centre_voxel = (*pCell).get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
-        int voxel_size = 30; // note this must be the same as the mechanics_voxel_size
-        int test = 2.0 * (*pCell).parameters.mLength / voxel_size; //allows us to sample along the fibre
-
-        std::vector<double> fibre_start(3, 0.0);
-        std::vector<double> fibre_end(3, 0.0);
-        for (unsigned int i = 0; i < 3; i++) {
-            fibre_start[i] = (*pCell).position[i] - (*pCell).parameters.mLength * (*pCell).state.orientation[i];
-            fibre_end[i] = (*pCell).position[i] + (*pCell).parameters.mLength * (*pCell).state.orientation[i];
-        }
-        end_voxel = (*pCell).get_container()->underlying_mesh.nearest_voxel_index(fibre_end);
-        // don't deregister the fibre from the voxel containing its centre
-        if (end_voxel != centre_voxel) {
-            (*pCell).get_container()->remove_agent_from_voxel(pCell, end_voxel);
-        }
-
-        std::vector<double> point_on_fibre(3, 0.0);
-        for (unsigned int j = 0; j < test + 1; j++) {
-            for (unsigned int i = 0; i < 3; i++) {
-                point_on_fibre[i] = fibre_start[i] + j * voxel_size * (*pCell).state.orientation[i];
-            }
-            voxel = (*pCell).get_container()->underlying_mesh.nearest_voxel_index(point_on_fibre);
-            // don't deregister the fibre from the voxel containing its centre
-            if (voxel != centre_voxel && voxel != end_voxel) {
-                (*pCell).get_container()->remove_agent_from_voxel(pCell, voxel);
+        std::list<int> voxels = register_fibre_voxels(pCell);
+        int centre_voxel = 
+               (*pCell).get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
+        for (int x: voxels) {
+            if (x != centre_voxel) {
+                (*pCell).get_container()->remove_agent_from_voxel(pCell, x);
             }
         }
     }
@@ -3768,71 +3756,37 @@ std::list<int> find_agent_voxels(Cell *pCell) {
 
     /* this code is for creating a list of all voxels which either contain the agent
      * or are neighboring voxels of the voxel containing the agent */
-    std::list<int> agent_voxels;
-    int voxel;
-
-    // for fibres:
-    if (pCell->type_name == "fibre") {
-        int voxel_size = 30; // note this must be the same as the mechanics_voxel_size
-        int test = 2.0 * pCell->parameters.mLength / voxel_size; //allows us to sample along the fibre
-
-        //first add the fibre end point voxel
-        std::vector<double> fibre_start(3, 0.0);
-        std::vector<double> fibre_end(3, 0.0);
-        for (unsigned int i = 0; i < 3; i++) {
-            fibre_start[i] = pCell->position[i] - pCell->parameters.mLength * pCell->state.orientation[i];
-            fibre_end[i] = pCell->position[i] + pCell->parameters.mLength * pCell->state.orientation[i];
-        }
-        voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(fibre_end);
-        agent_voxels.push_back(voxel);
-        // then walk along the fibre from the start point sampling voxels as we go
-        std::vector<double> point_on_fibre(3, 0.0);
-        for (unsigned int j = 0; j < test + 1; j++) {
-            for (unsigned int i = 0; i < 3; i++) {
-                point_on_fibre[i] = fibre_start[i] + j * voxel_size * pCell->state.orientation[i];
-            }
-            voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(point_on_fibre);
-            agent_voxels.push_back(voxel);
-            std::vector<int>::iterator neighbor_voxel_index;
-            std::vector<int>::iterator neighbor_voxel_index_end =
-                    pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[voxel].end();
-            for (neighbor_voxel_index =
-                    pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[voxel].begin();
-                    neighbor_voxel_index != neighbor_voxel_index_end;
-                    ++neighbor_voxel_index) {
-                agent_voxels.push_back(*neighbor_voxel_index);
-            }
+    std::list<int> all_agent_voxels_to_test;
+    std::list<int> voxels = register_fibre_voxels(pCell);
+    for (int x: voxels) {
+        all_agent_voxels_to_test.push_back(x);
+        std::vector<int>::iterator xx;
+        std::vector<int>::iterator x_end =
+                pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[x].end();
+        for (xx = pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[x].begin();
+             xx != x_end;
+             ++xx) {
+            all_agent_voxels_to_test.push_back(*xx);
         }
     }
-    // for other agent types:
-    else {
-        voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
-        agent_voxels.push_back(voxel);
-        std::vector<int>::iterator neighbor_voxel_index;
-        std::vector<int>::iterator neighbor_voxel_index_end =
-                pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[voxel].end();
-        for (neighbor_voxel_index =
-                pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[voxel].begin();
-                neighbor_voxel_index != neighbor_voxel_index_end;
-                ++neighbor_voxel_index) {
-            agent_voxels.push_back(*neighbor_voxel_index);
-        }
-    }
-
     // get rid of any duplicated voxels
-    agent_voxels.sort();
-    agent_voxels.unique();
-
-    return agent_voxels;
+    all_agent_voxels_to_test.sort();
+    all_agent_voxels_to_test.unique();
+    
+    return all_agent_voxels_to_test;
 }
 
 void find_agent_neighbors(Cell *pCell) {
+
+    std::cout << "time is " << PhysiCell_globals.current_time << " agent " << pCell->ID << std::endl;
 
     /* this code is for finding all neighbors of an agent: first we call find_agent_voxels
      *  to create a list of all the voxels to test, then we search for agents in those voxels */
     std::list<int> voxels_to_test = find_agent_voxels(pCell);
 
+    //std::cout << "Agent " << pCell->ID << " is tested in voxels: " ;
     for (int x: voxels_to_test) {
+        //std::cout << x << " " ;
         std::vector<Cell *>::iterator neighbor;
         std::vector<Cell *>::iterator end = pCell->get_container()->agent_grid[x].end();
         for (neighbor = pCell->get_container()->agent_grid[x].begin(); neighbor != end; ++neighbor) {
@@ -3843,6 +3797,7 @@ void find_agent_neighbors(Cell *pCell) {
             }
         }
     }
+    //std::cout << std::endl;
 }
 
 };
