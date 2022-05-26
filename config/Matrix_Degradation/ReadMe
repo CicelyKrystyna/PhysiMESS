@@ -1,0 +1,6 @@
+In order to run this example 
+- Everything in the third add_potentials if loop between a fibre and a cell is commented out
+- Fibre degradation is switched on but we reduce the rate of fibre degradation:
+  double prob_degradation = 0.01; (second if loop of add_potentials)
+
+Note that this was a hastily created model so will need plenty of refining.

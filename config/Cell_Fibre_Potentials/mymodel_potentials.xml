@@ -381,7 +381,7 @@
 	
 	<initial_conditions>
 		<cell_positions type="csv" enabled="true">
-			<folder>./config/Fibre_Degradation</folder>
+			<folder>./config/Cell_Fibre_Potentials</folder>
 			<filename>cells_and_fibres.csv</filename>
 		</cell_positions>
 	</initial_conditions>	
@@ -397,7 +397,7 @@
         <fibre_radius type="double" units="none" description="fibre radius">2.0</fibre_radius>
         <fibre_angle type="double" units="none" desctription="angle of fibre direction">0.2</fibre_angle>
         
-        <fibre_degradation type="bool" units="none" description="flag for fibre degradation">true</fibre_degradation>
+        <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
         <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
         <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.001</vel_contact>
         <cell_velocity_max type="double" units="none" description="used in cell-fibre adhesion">1.0</cell_velocity_max>

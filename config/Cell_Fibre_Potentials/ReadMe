@@ -1,0 +1,50 @@
+In order to run different examples for this part you need to enter and change parts of the PhysiMESS code. Specifically, you need to comment/uncomment lines in the function add_potentials in PhysiCell_cell.cpp.
+
+===============================================================================================
+Fibre tracking Example
+===============================================================================================
+For this example we observe cells tracking along fibres 
+- Fibre Degradation switched off
+- In the second add_potentials if loop between a cell and a fibre
+- Everything in the third add_potentials if loop between a fibre and a cell is commented
+- You can play about with the adhesion and repulsion strengths in the xml:
+  <vel_adhesion>0.6</vel_adhesion>
+  <vel_contact>0.001</vel_contact>
+  <cell_velocity_max>1.0</cell_velocity_max>
+===============================================================================================
+
+===============================================================================================
+Snow Plough Example
+===============================================================================================
+For this example we observe cells pushing fibres providing those fibres have no cross-links
+- Fibre Degradation switched off
+- In the third add_potentials if loop between a fibre and a cell
+- The following should be uncommented and ensure crosslink count set to >=1
+  if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 1) 
+  { return;}
+- uncomment between 
+  /* for snow plough example uncomment from here: */ 
+  and 
+  /* for snow plough example uncomment to here: */
+===============================================================================================
+
+===============================================================================================
+Hinge Example
+===============================================================================================
+For this example we observe cells both snow ploughing non-crosslinks fibres but also rotating 
+singularly crosslinked fibres at a hinge. Note that this is the very early stages of implementing the Physics so it's beyond basic. Indeed the rotation currently has nothing to do with physics.
+- Fibre Degradation switched off
+- In the third add_potentials if loop between a fibre and a cell
+- The following should be uncommented and ensure crosslink count set to >=2
+  if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) 
+  { return;}
+- uncomment both between 
+  /* for snow plough example uncomment from here: */ 
+  and 
+  /* for snow plough example uncomment to here: */
+  and 
+  /* for hinge example uncomment from here: */ 
+  and 
+  /* for hinge example uncomment to here: */
+
+===============================================================================================

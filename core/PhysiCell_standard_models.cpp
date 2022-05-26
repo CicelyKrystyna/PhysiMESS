@@ -651,7 +651,6 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
     if (1 <= pCell->parameters.unstuck_counter && pCell->parameters.unstuck_counter < unstuck_threshold+1) {
         /*std::cout << " getting unstuck at time "
         << PhysiCell_globals.current_time << std::endl;*/
-        std::cout << std::endl;
         pCell->parameters.unstuck_counter++;
         pCell->force_update_motility_vector(dt);
         pCell->velocity += phenotype.motility.motility_vector;
