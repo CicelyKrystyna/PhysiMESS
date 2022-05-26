@@ -1395,8 +1395,8 @@ void Cell::add_potentials(Cell* other_agent)
 
             int stuck_threshold = 10;
             if (this->parameters.stuck_counter >= stuck_threshold) {
-                std::cout << "Cell " << this->ID << " is stuck at time " << PhysiCell_globals.current_time
-                          << " near fibre " << (*other_agent).ID  << std::endl;
+                //std::cout << "Cell " << this->ID << " is stuck at time " << PhysiCell_globals.current_time
+                          //<< " near fibre " << (*other_agent).ID  << std::endl;
                 displacement *= -1.0/distance;
                 double dot_product = DotProduct(displacement, phenotype.motility.motility_vector);
                 if (this->parameters.fibredegradation &&
@@ -1404,7 +1404,7 @@ void Cell::add_potentials(Cell* other_agent)
                     double rand_degradation = UniformRandom();
                     double prob_degradation = 0.1;
                     if (rand_degradation <= prob_degradation) {
-                        std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
+                        //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                         (*other_agent).parameters.degradation_flag = true;
                         this->parameters.stuck_counter = 0;
                     }
@@ -1416,27 +1416,26 @@ void Cell::add_potentials(Cell* other_agent)
 
     // fibre interacting with a cell
     else if (this->type_name == "fibre" && (*other_agent).type_name != "fibre") {
-
         //std::cout << "fibre-cell interaction" << std::endl;
 
         /* note fibres only get pushed by motile cells and if they have no crosslinks
            we intend to update this to be that fibres with one crosslink pivot at the crosslink location */
-        /*if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
+        if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
             return;
-        }*/
+        }
 
-        /*double distance = 0.0;
+        /* for snow plough example uncomment from here: */
+        double distance = 0.0;
         nearest_point_on_fibre((*other_agent).position, this, displacement);
         for (int index = 0; index < 3; index++) {
             distance += displacement[index] * displacement[index];
         }
-        distance = std::max(sqrt(distance), 0.00001);*/
-        /*std::cout << " determining distance from " << this->type_name << " " << this->ID << " to "
-                << (*other_agent).type_name << " " << (*other_agent).ID
-                << "   the distance is " << distance << std::endl;*/
+        distance = std::max(sqrt(distance), 0.00001);
+        //std::cout << " determining distance from " << this->type_name << " " << this->ID <<
+        // " to " << (*other_agent).type_name << " " << (*other_agent).ID << "   the distance is " << distance << std::endl;
         // check distance relative repulsion and adhesion distances
         // fibre should repel and be pushed by a cell if it comes within cell radius plus fibre radius (note fibre radius ~2 micron)
-        /*double R = phenotype.geometry.radius + this->parameters.mRadius;
+        double R = phenotype.geometry.radius + this->parameters.mRadius;
 
         if (this->parameters.X_crosslink_count == 0 ) {
             // as per PhysiCell
@@ -1463,16 +1462,18 @@ void Cell::add_potentials(Cell* other_agent)
             if (fabs(temp_r) < 1e-16) { return; }
             temp_r /= distance;
             naxpy(&velocity, temp_r, displacement);
-        }*/
+        }
+        /* for snow plough example uncomment to here: */
 
-        /*if (this->parameters.X_crosslink_count == 1 && distance <= R) {
+        /* for hinge example uncomment from here: */
+        if (this->parameters.X_crosslink_count == 1 && distance <= R) {
             int index = 0;
-            /*if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) !=
-                this->state.crosslinkers.end()) {
-                while (this->state.crosslinkers[index] != other_agent) {
-                    index++;
-                }*/
-            /*std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
+            //if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
+                //while (this->state.crosslinkers[index] != other_agent) {
+                    //index++;
+                //}
+            //}
+            //std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
 
             double angle = 0.01;
             nearest_point_on_fibre(this->position, this->state.crosslinkers[index], displacement);
@@ -1485,7 +1486,8 @@ void Cell::add_potentials(Cell* other_agent)
             this->state.orientation[0] = this->state.orientation[0] * cos(angle) - this->state.orientation[1] * sin(angle);
             this->state.orientation[1] = this->state.orientation[0] * sin(angle) + this->state.orientation[1] * cos(angle);
             normalize(&this->state.orientation);
-        }*/
+        }
+        /* for hinge example uncomment to here: */
         return;
     }
 
@@ -3764,8 +3766,7 @@ std::list<int> find_agent_voxels(Cell *pCell) {
         std::vector<int>::iterator x_end =
                 pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[x].end();
         for (xx = pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[x].begin();
-             xx != x_end;
-             ++xx) {
+             xx != x_end; ++xx) {
             all_agent_voxels_to_test.push_back(*xx);
         }
     }
@@ -3777,8 +3778,6 @@ std::list<int> find_agent_voxels(Cell *pCell) {
 }
 
 void find_agent_neighbors(Cell *pCell) {
-
-    std::cout << "time is " << PhysiCell_globals.current_time << " agent " << pCell->ID << std::endl;
 
     /* this code is for finding all neighbors of an agent: first we call find_agent_voxels
      *  to create a list of all the voxels to test, then we search for agents in those voxels */
