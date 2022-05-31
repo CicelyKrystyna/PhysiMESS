@@ -998,7 +998,7 @@ void Cell::degrade_fibre(Cell *fibre_to_degrade) {
     // remove fibre from agent grid
     (*fibre_to_degrade).get_container()->remove_agent(fibre_to_degrade);
     // de-allocate (delete) the cell;
-    delete (fibre_to_degrade);
+    fibre_to_degrade->flag_for_removal();
     //}
 }
 
