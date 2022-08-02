@@ -166,8 +166,10 @@ void setup_tissue( void ){
     bool isFibreFromFile = false;
     bool fibreanisotropy = parameters.bools("anisotropic_fibres");
     double fibre_length = parameters.doubles("fibre_length");
+    double length_normdist_sd = parameters.doubles("length_normdist_sd");
     double fibre_radius = parameters.doubles("fibre_radius");
     double fibre_angle = parameters.doubles("fibre_angle");
+    double angle_normdist_sd = parameters.doubles("angle_normdist_sd");
 
 	for( int i=0; i < (*all_cells).size(); i++ ){
 
@@ -179,25 +181,27 @@ void setup_tissue( void ){
         (*all_cells)[i]->state.crosslink_point.resize(3,0.0);
 
         const auto agentname = std::string((*all_cells)[i]->type_name);
-        const auto fibre = std::string("fibre");
+        const auto ecm = std::string("ecm");
         const auto fiber = std::string("fiber");
+        const auto fibre = std::string("fibre");
         const auto rod = std::string("rod");
 
-        if (agentname.find(fibre) != std::string::npos ||
+        if (agentname.find(ecm) != std::string::npos ||
             agentname.find(fiber) != std::string::npos ||
+            agentname.find(fibre) != std::string::npos ||
             agentname.find(rod) != std::string::npos) {
             /* fibre positions are given by csv
                assign fibre orientation and test whether out of bounds */
             isFibreFromFile = true;
 
-            (*all_cells)[i]->parameters.mLength = NormalRandom(fibre_length, 0.0) / 2.0;
+            (*all_cells)[i]->parameters.mLength = NormalRandom(fibre_length, length_normdist_sd) / 2.0;
             (*all_cells)[i]->parameters.mRadius = fibre_radius;
 
             //assign fibre orientation as a random vector from points on unit sphere/circle
             (*all_cells)[i]->assign_orientation();
             if (default_microenvironment_options.simulate_2D) {
                 if (fibreanisotropy){
-                    double theta = NormalRandom(fibre_angle,0.0);
+                    double theta = NormalRandom(fibre_angle,angle_normdist_sd);
                     (*all_cells)[i]->state.orientation[0] = cos(theta);
                     (*all_cells)[i]->state.orientation[1] = sin(theta);
                 }
@@ -333,8 +337,9 @@ void setup_tissue( void ){
             std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl;
 
             const auto agentname = std::string(pCD->name);
-            const auto fibre = std::string("fibre");
+            const auto ecm = std::string("ecm");
             const auto fiber = std::string("fiber");
+            const auto fibre = std::string("fibre");
             const auto rod = std::string("rod");
 
             if (agentname.find(fibre) == std::string::npos &&
@@ -358,8 +363,9 @@ void setup_tissue( void ){
                 }
             }
 
-            if (agentname.find(fibre) != std::string::npos ||
+            if (agentname.find(ecm) != std::string::npos ||
                 agentname.find(fiber) != std::string::npos ||
+                agentname.find(fibre) != std::string::npos ||
                 agentname.find(rod) != std::string::npos){
                 for ( int nf = 0 ; nf < parameters.ints("number_of_fibres") ; nf++ ) {
 
@@ -375,14 +381,14 @@ void setup_tissue( void ){
                     pC->parameters.fibredegradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3,0.0);
 
-                    pC->parameters.mLength = NormalRandom(fibre_length, 0.0) / 2.0;
+                    pC->parameters.mLength = NormalRandom(fibre_length, length_normdist_sd) / 2.0;
                     pC->parameters.mRadius = fibre_radius;
 
                     //assign fibre orientation as a random vector from points on unit sphere/circle.
                     pC->assign_orientation();
                     if( default_microenvironment_options.simulate_2D) {
                         if (fibreanisotropy) {
-                            double theta = NormalRandom(fibre_angle, 0.0);
+                            double theta = NormalRandom(fibre_angle, angle_normdist_sd);
                             pC->state.orientation[0] = cos(theta);
                             pC->state.orientation[1] = sin(theta);
                         }

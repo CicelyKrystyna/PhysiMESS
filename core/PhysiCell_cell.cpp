@@ -1402,7 +1402,7 @@ void Cell::add_potentials(Cell* other_agent)
                 if (this->parameters.fibredegradation &&
                     dot_product >= 0) {
                     double rand_degradation = UniformRandom();
-                    double prob_degradation = 0.1;
+                    double prob_degradation = 0.01;
                     if (rand_degradation <= prob_degradation) {
                         //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                         (*other_agent).parameters.degradation_flag = true;
@@ -1420,12 +1420,12 @@ void Cell::add_potentials(Cell* other_agent)
 
         /* note fibres only get pushed by motile cells and if they have no crosslinks
            we intend to update this to be that fibres with one crosslink pivot at the crosslink location */
-        if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
+        /*if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
             return;
-        }
+        }*/
 
         /* for snow plough example uncomment from here: */
-        double distance = 0.0;
+        /*double distance = 0.0;
         nearest_point_on_fibre((*other_agent).position, this, displacement);
         for (int index = 0; index < 3; index++) {
             distance += displacement[index] * displacement[index];
@@ -1462,11 +1462,11 @@ void Cell::add_potentials(Cell* other_agent)
             if (fabs(temp_r) < 1e-16) { return; }
             temp_r /= distance;
             naxpy(&velocity, temp_r, displacement);
-        }
+        }*/
         /* for snow plough example uncomment to here: */
 
         /* for hinge example uncomment from here: */
-        if (this->parameters.X_crosslink_count == 1 && distance <= R) {
+        /*if (this->parameters.X_crosslink_count == 1 && distance <= R) {
             int index = 0;
             //if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
                 //while (this->state.crosslinkers[index] != other_agent) {
@@ -1486,7 +1486,7 @@ void Cell::add_potentials(Cell* other_agent)
             this->state.orientation[0] = this->state.orientation[0] * cos(angle) - this->state.orientation[1] * sin(angle);
             this->state.orientation[1] = this->state.orientation[0] * sin(angle) + this->state.orientation[1] * cos(angle);
             normalize(&this->state.orientation);
-        }
+        }*/
         /* for hinge example uncomment to here: */
         return;
     }
