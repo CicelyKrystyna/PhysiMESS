@@ -1218,9 +1218,8 @@ void Cell::add_potentials(Cell* other_agent)
     // no interactions with self
     if (this == other_agent) { return; }
 
-    // two non-fibre agents interacting - as per PhysiCell
+    // two non-fibre agents e.g. cell-cell interacting - as per PhysiCell
     if (this->type_name != "fibre" && (*other_agent).type_name != "fibre") {
-        //std::cout << " cell-cell interaction " << std::endl;
 
         // 12 uniform neighbors at a close packing distance, after dividing out all constants
         static double simple_pressure_scale = 0.027288820670331; // 12 * (1 - sqrt(pi/(2*sqrt(3))))^2
@@ -1230,12 +1229,11 @@ void Cell::add_potentials(Cell* other_agent)
             displacement[i] = position[i] - (*other_agent).position[i];
             distance += displacement[i] * displacement[i];
         }
-        // Make sure that the distance is not zero
-        distance = std::max(sqrt(distance), 0.00001);
+        distance = std::max(sqrt(distance), 0.00001); // Make sure that the distance is not zero
 
         //Repulsive
         double R = phenotype.geometry.radius + (*other_agent).phenotype.geometry.radius;
-        double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;
+        //double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;
         double temp_r, c;
         if (distance > R) {
             temp_r = 0;
@@ -1270,7 +1268,6 @@ void Cell::add_potentials(Cell* other_agent)
         // Adhesive
         //double max_interactive_distance = parameters.max_interaction_distance_factor * phenotype.geometry.radius +
         //	(*other_agent).parameters.max_interaction_distance_factor * (*other_agent).phenotype.geometry.radius;
-
         double max_interactive_distance =
                 phenotype.mechanics.relative_maximum_adhesion_distance * phenotype.geometry.radius +
                 (*other_agent).phenotype.mechanics.relative_maximum_adhesion_distance *
@@ -1311,10 +1308,8 @@ void Cell::add_potentials(Cell* other_agent)
         //state.neighbors.push_back(other_agent); // new 1.8.0
     }
 
-    // cell interacting with a fibre
+    // cell-type agent interacting with a fibre-type agent
     else if (this->type_name != "fibre" && (*other_agent).type_name == "fibre") {
-
-        //std::cout << "cell-fibre interaction " << std::endl;
 
         double distance = 0.0;
         nearest_point_on_fibre(this->position, other_agent, displacement);
@@ -1378,7 +1373,6 @@ void Cell::add_potentials(Cell* other_agent)
             }
             cell_velocity = std::max(sqrt(cell_velocity), 1e-8);
 
-
             double p_exponent = 1.;
             double q_exponent = 1.;
             double xi = fabs(cell_velocity_dot_fibre_direction) / (cell_velocity);
@@ -1393,14 +1387,14 @@ void Cell::add_potentials(Cell* other_agent)
             axpy(&velocity, fibre_adhesion, (*other_agent).state.orientation);
             naxpy(&velocity, fibre_repulsion, previous_velocity);
 
+            // Fibre degradation by cell - switched on by flag fibredegradation
             int stuck_threshold = 10;
-            if (this->parameters.stuck_counter >= stuck_threshold) {
+            if (this->parameters.fibre_degradation && this->parameters.stuck_counter >= stuck_threshold) {
                 //std::cout << "Cell " << this->ID << " is stuck at time " << PhysiCell_globals.current_time
                           //<< " near fibre " << (*other_agent).ID  << std::endl;
                 displacement *= -1.0/distance;
                 double dot_product = DotProduct(displacement, phenotype.motility.motility_vector);
-                if (this->parameters.fibredegradation &&
-                    dot_product >= 0) {
+                if (dot_product >= 0) {
                     double rand_degradation = UniformRandom();
                     double prob_degradation = 0.01;
                     if (rand_degradation <= prob_degradation) {
@@ -1414,80 +1408,114 @@ void Cell::add_potentials(Cell* other_agent)
 
     }
 
-    // fibre interacting with a cell
+    // fibre-type agent interacting with a cell-type agent
     else if (this->type_name == "fibre" && (*other_agent).type_name != "fibre") {
-        //std::cout << "fibre-cell interaction" << std::endl;
 
-        /* note fibres only get pushed by motile cells and if they have no crosslinks
-           we intend to update this to be that fibres with one crosslink pivot at the crosslink location */
+        /* note fibres only get pushed by motile cells and if they have no crosslinks */
         /*if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
             return;
         }*/
 
-        /* for snow plough example uncomment from here: */
-        /*double distance = 0.0;
+        double distance = 0.0;
         nearest_point_on_fibre((*other_agent).position, this, displacement);
         for (int index = 0; index < 3; index++) {
             distance += displacement[index] * displacement[index];
         }
         distance = std::max(sqrt(distance), 0.00001);
-        //std::cout << " determining distance from " << this->type_name << " " << this->ID <<
-        // " to " << (*other_agent).type_name << " " << (*other_agent).ID << "   the distance is " << distance << std::endl;
-        // check distance relative repulsion and adhesion distances
-        // fibre should repel and be pushed by a cell if it comes within cell radius plus fibre radius (note fibre radius ~2 micron)
+        // fibre should only interact with cell if it comes within cell radius plus fibre radius (note fibre radius ~2 micron)
         double R = phenotype.geometry.radius + this->parameters.mRadius;
 
-        if (this->parameters.X_crosslink_count == 0 ) {
-            // as per PhysiCell
-            static double simple_pressure_scale = 0.027288820670331;
+        if (distance <= R) {
+            std::vector<double> point_of_impact(3, 0.0);
+            for (int index = 0; index < 3; index++) {
+                point_of_impact[index] = (*other_agent).position[index] - displacement[index];
+            }
+            /*std::cout << " the point of impact is " << point_of_impact[0] << " " << point_of_impact[1] << " " << point_of_impact[2] << std::endl;
+              std::cout << " determining distance from " << this->type_name << " " << this->ID <<
+             " to " << (*other_agent).type_name << " " << (*other_agent).ID << "   the distance is " << distance << std::endl;*/
 
-            double temp_r = 0;
-            if (distance > R) {
-                temp_r = 0;
-            } else {
-                // temp_r = 1 - distance/R;
-                temp_r = -distance; // -d
-                temp_r /= R; // -d/R
-                temp_r += 1.0; // 1-d/R
-                temp_r *= temp_r; // (1-d/R)^2
+            if (this->parameters.X_crosslink_count == 0) {
 
-                // add the relative pressure contribution NOT SURE IF NEEDED
-                state.simple_pressure += (temp_r / simple_pressure_scale);
+                // cell-fibre pushing only if fibre un-crosslinked
+                if (this->parameters.fibre_pushing) {
+                    // as per PhysiCell
+                    static double simple_pressure_scale = 0.027288820670331;
 
-                double effective_repulsion = sqrt(phenotype.mechanics.cell_cell_repulsion_strength *
-                                                  (*other_agent).phenotype.mechanics.cell_cell_repulsion_strength);
-                temp_r *= effective_repulsion;
+                    // temp_r = 1 - distance/R;
+                    double temp_r = 0;
+                    temp_r = -distance;
+                    temp_r /= R;
+                    temp_r += 1.0;
+                    temp_r *= temp_r;
+
+                    // add the relative pressure contribution NOT SURE IF NEEDED
+                    state.simple_pressure += (temp_r / simple_pressure_scale);
+
+                    double effective_repulsion = sqrt(phenotype.mechanics.cell_cell_repulsion_strength *
+                                                      (*other_agent).phenotype.mechanics.cell_cell_repulsion_strength);
+                    temp_r *= effective_repulsion;
+
+                    if (fabs(temp_r) < 1e-16) { return; }
+                    temp_r /= distance;
+                    naxpy(&velocity, temp_r, displacement);
+                }
+
+                // independent fibre rotation
+                if (this->parameters.fibre_rotation) {
+                    std::vector<double> old_orientation(3, 0.0);
+                    for (int i = 0; i < 2; i++) {
+                        old_orientation[i] = this->state.orientation[i];
+                    }
+
+                    double moment_arm_magnitude = sqrt(
+                            point_of_impact[0] * point_of_impact[0] + point_of_impact[1] * point_of_impact[1]);
+                    double impulse = (*other_agent).phenotype.motility.migration_speed * moment_arm_magnitude;
+                    double fibre_length = 2 * this->parameters.mLength;
+                    double angular_velocity = impulse / (0.5 * fibre_length * fibre_length);
+                    double angle = angular_velocity;
+                    this->state.orientation[0] = old_orientation[0] * cos(angle) - old_orientation[1] * sin(angle);
+                    this->state.orientation[1] = old_orientation[0] * sin(angle) + old_orientation[1] * cos(angle);
+                    normalize(&this->state.orientation);
+                }
             }
 
-            if (fabs(temp_r) < 1e-16) { return; }
-            temp_r /= distance;
-            naxpy(&velocity, temp_r, displacement);
-        }*/
-        /* for snow plough example uncomment to here: */
+            // fibre rotation around other fibre
+            if (this->parameters.fibre_rotation && this->parameters.X_crosslink_count == 1) {
+                int index = 0;
+                /*if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
+                 while (this->state.crosslinkers[index] != other_agent) {
+                   index++;
+                 }
+                }*/
+                //std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
 
-        /* for hinge example uncomment from here: */
-        /*if (this->parameters.X_crosslink_count == 1 && distance <= R) {
-            int index = 0;
-            //if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
-                //while (this->state.crosslinkers[index] != other_agent) {
-                    //index++;
-                //}
-            //}
-            //std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
-
-            double angle = 0.01;
-            nearest_point_on_fibre(this->position, this->state.crosslinkers[index], displacement);
-            std::vector<double> point(3, 0.0);
-            for (int i = 0; i < 2; i++) {
-                point[i] = this->position[i] - displacement[i];
+                // ONLY IN 2D FOR NOW
+                double theta = 0.01;
+                double distance_fibre_centre_to_crosslink = 0.0;
+                nearest_point_on_fibre(this->position, this->state.crosslinkers[index], displacement);
+                std::vector<double> crosslink_point(3, 0.0);
+                std::vector<double> old_orientation(3, 0.0);
+                for (int i = 0; i < 2; i++) {
+                    crosslink_point[i] = this->position[i] - displacement[i];
+                    distance_fibre_centre_to_crosslink += displacement[i] * displacement[i];
+                    old_orientation[i] = this->state.orientation[i];
+                }
+                distance_fibre_centre_to_crosslink = sqrt(distance_fibre_centre_to_crosslink);
+                //std::cout << " the crosslink point is " << point[0] << " " << point[1] << " " << point[2] << std::endl;
+                //std::cout << " the displacement between " << this->type_name << " and this point is " << displacement[0] << " " << displacement[1] << " " << displacement[2] << std::endl;
+                //std::cout << " the distance is " << distance_centre_to_crosslink << std::endl;
+                //std::cout << cos(theta) << " " << sin(theta) << std::endl;
+                //this->state.orientation[0] = old_orientation[0] * cos(theta) - old_orientation[1] * sin(theta);
+                //this->state.orientation[1] = old_orientation[0] * sin(theta) + old_orientation[1] * cos(theta);
+                //normalize(&this->state.orientation);
+                //this->position[0] = point[0] + distance_centre_to_crosslink*state.orientation[0];
+                        //cos(angle) * (this->position[0] - point[0]) - sin(angle) * (this->position[1] - point[1]) + point[0];
+                //this->position[1] = point[1] + distance_centre_to_crosslink*state.orientation[1];
+                        //sin(angle) * (this->position[0] - point[0]) + cos(angle) * (this->position[1] - point[1]) + point[1];
+                //std::cout << state.orientation[0] << " " << state.orientation[1] << " " << state.orientation[2] << std::endl;*/
             }
-            this->position[0] = cos(0.1) * (this->position[0] - point[0]) - sin(angle) * (this->position[1] - point[1]) + point[0];
-            this->position[1] = sin(0.1) * (this->position[0] - point[0]) + cos(angle) * (this->position[1] - point[1]) + point[1];
-            this->state.orientation[0] = this->state.orientation[0] * cos(angle) - this->state.orientation[1] * sin(angle);
-            this->state.orientation[1] = this->state.orientation[0] * sin(angle) + this->state.orientation[1] * cos(angle);
-            normalize(&this->state.orientation);
-        }*/
-        /* for hinge example uncomment to here: */
+        }
+
         return;
     }
 
