@@ -279,7 +279,7 @@
           </custom_data>
           </cell_definition>
 
-      <cell_definition name="fibre_horizontal" ID="2">
+      <cell_definition name="attractant" ID="2">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
