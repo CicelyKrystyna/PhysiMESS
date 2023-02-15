@@ -380,7 +380,7 @@
       </cell_definitions>
 	
 	<initial_conditions>
-		<cell_positions type="csv" enabled="true">
+		<cell_positions type="csv" enabled="false">
 			<folder>./config/Fibre_Initialisation</folder>
 			<filename>initialfibres.csv</filename>
 		</cell_positions>
@@ -391,10 +391,10 @@
 		
         <number_of_cells type="int" units="none" description="initial number of cells">0</number_of_cells>
         
-        <number_of_fibres type="int" units="none" description="initial number of fibres">1000</number_of_fibres>
+        <number_of_fibres type="int" units="none" description="initial number of fibres">2000</number_of_fibres>
         
-        <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">true</anisotropic_fibres>
-        <fibre_length type="double" units="none" description="fibre length">40.0</fibre_length>
+        <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">false</anisotropic_fibres>
+        <fibre_length type="double" units="none" description="fibre length">75.0</fibre_length>
         <length_normdist_sd type="double" units="none" description="standard deviation of fibre length">0.0</length_normdist_sd>
         <fibre_radius type="double" units="none" description="fibre radius">2.0</fibre_radius>
         <fibre_angle type="double" units="none" desctription="angle of fibre direction">1.57</fibre_angle>
