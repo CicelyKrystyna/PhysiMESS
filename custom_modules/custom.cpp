@@ -178,6 +178,7 @@ void setup_tissue( void ){
         (*all_cells)[i]->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
         (*all_cells)[i]->parameters.mVelocityContact = parameters.doubles("vel_contact");
         (*all_cells)[i]->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+        (*all_cells)[i]->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
         (*all_cells)[i]->parameters.fibre_degradation = parameters.bools("fibre_degradation");
         (*all_cells)[i]->state.crosslink_point.resize(3,0.0);
 
@@ -358,6 +359,7 @@ void setup_tissue( void ){
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
                     pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+                    pC->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
                     pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3, 0.0);
 
@@ -381,6 +383,7 @@ void setup_tissue( void ){
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
                     pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+                    pC->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
                     pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3,0.0);
 

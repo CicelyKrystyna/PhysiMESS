@@ -401,6 +401,7 @@
         
         <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
         <fibre_deg_rate type="double" units="none" description="rate of fibre degradation">0.001</fibre_deg_rate>
+        <fibre_stuck type="double" units="none" description="how long to wait before considered stuck">10</fibre_stuck>
         
         
         <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
