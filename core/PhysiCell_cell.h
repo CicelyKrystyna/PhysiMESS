@@ -113,6 +113,7 @@ class Cell_Parameters
 	int necrosis_type; // deprecate
 
     bool fibre_degradation = false; // PhysiMESS
+    double fibreDegradationRate = 0.0; // PhysiMESS
     bool fibre_rotation = false; // PhysiMESS
     bool fibre_pushing = false; // PhysiMESS
 

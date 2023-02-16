@@ -177,7 +177,8 @@ void setup_tissue( void ){
 		(*all_cells)[i]->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
         (*all_cells)[i]->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
         (*all_cells)[i]->parameters.mVelocityContact = parameters.doubles("vel_contact");
-        (*all_cells)[i]->parameters.fibredegradation = parameters.bools("fibre_degradation");
+        (*all_cells)[i]->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+        (*all_cells)[i]->parameters.fibre_degradation = parameters.bools("fibre_degradation");
         (*all_cells)[i]->state.crosslink_point.resize(3,0.0);
 
         const auto agentname = std::string((*all_cells)[i]->type_name);
@@ -356,7 +357,8 @@ void setup_tissue( void ){
                     pC->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
-                    pC->parameters.fibredegradation = parameters.bools("fibre_degradation");
+                    pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+                    pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3, 0.0);
 
                     pC->assign_position(position);
@@ -378,7 +380,8 @@ void setup_tissue( void ){
                     pC->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
-                    pC->parameters.fibredegradation = parameters.bools("fibre_degradation");
+                    pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
+                    pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3,0.0);
 
                     pC->parameters.mLength = NormalRandom(fibre_length, length_normdist_sd) / 2.0;

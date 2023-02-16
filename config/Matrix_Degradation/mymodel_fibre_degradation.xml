@@ -52,11 +52,11 @@
 	<microenvironment_setup>
 		<variable name="substrate" units="dimensionless" ID="0">
         <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">10.0</diffusion_coefficient>
+          <diffusion_coefficient units="micron^2/min">1000000.0</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
-        <initial_condition units="mmHg">0.0</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
+        <initial_condition units="mmHg">0.25</initial_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0.25</Dirichlet_boundary_condition>
       </variable>
 
       <variable name="nutrient" units="dimensionless" ID="1">
@@ -87,7 +87,7 @@
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="true">0.0072</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -95,7 +95,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0</death_rate>
               <phase_durations units="min">
-                <duration index="0" fixed_duration="false">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -146,7 +146,7 @@
           </mechanics>
 
           <motility>
-            <speed>0</speed>
+            <speed>1</speed>
             <persistence_time>10.0</persistence_time>
             <migration_bias>0.5</migration_bias>
             <options>
@@ -382,7 +382,7 @@
 	<initial_conditions>
 		<cell_positions type="csv" enabled="true">
 			<folder>./config/Matrix_Degradation</folder>
-			<filename>cells.csv</filename>
+			<filename>cells_and_fibres.csv</filename>
 		</cell_positions>
 	</initial_conditions>	
 	
@@ -393,15 +393,17 @@
         <number_of_fibres type="int" units="none" description="initial number of fibres">1000</number_of_fibres>
         
         <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">false</anisotropic_fibres>
-        <fibre_length type="double" units="none" description="fibre length">75.0</fibre_length>
+        <fibre_length type="double" units="none" description="fibre length">40.0</fibre_length>
         <length_normdist_sd type="double" units="none" description="standard deviation of fibre length">0.0</length_normdist_sd>
         <fibre_radius type="double" units="none" description="fibre radius">2.0</fibre_radius>
         <fibre_angle type="double" units="none" desctription="angle of fibre direction">0.2</fibre_angle>
         <angle_normdist_sd type="double" units="none" description="standard deviation of fibre angle">0.0</angle_normdist_sd>
         
         <fibre_degradation type="bool" units="none" description="flag for fibre degradation">true</fibre_degradation>
+        <fibre_deg_rate type="double" units="none" description="rate of fibre degradation">0.01</fibre_deg_rate>
+        
         <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
-        <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.001</vel_contact>
+        <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.1</vel_contact>
         <cell_velocity_max type="double" units="none" description="used in cell-fibre adhesion">1.0</cell_velocity_max>
         </user_parameters>
 	
