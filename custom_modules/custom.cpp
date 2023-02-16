@@ -184,6 +184,10 @@ void setup_tissue( void ){
         (*all_cells)[i]->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
         (*all_cells)[i]->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
         (*all_cells)[i]->parameters.fibre_degradation = parameters.bools("fibre_degradation");
+
+        (*all_cells)[i]->parameters.fibre_pushing = parameters.bools("fibre_pushing");
+        (*all_cells)[i]->parameters.fibre_rotation = parameters.bools("fibre_rotation");
+
         (*all_cells)[i]->state.crosslink_point.resize(3,0.0);
 
         const auto agentname = std::string((*all_cells)[i]->type_name);
@@ -368,6 +372,10 @@ void setup_tissue( void ){
                     pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
                     pC->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
                     pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
+
+                    pC->parameters.fibre_pushing = parameters.bools("fibre_pushing");
+                    pC->parameters.fibre_rotation = parameters.bools("fibre_rotation");
+
                     pC->state.crosslink_point.resize(3, 0.0);
 
                     pC->assign_position(position);
@@ -391,10 +399,13 @@ void setup_tissue( void ){
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
                     pC->parameters.mPExponent = parameters.doubles("adh_pow");
                     pC->parameters.mQExponent = parameters.doubles("rep_pow");
-                    
+
                     pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
                     pC->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
                     pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
+
+                    pC->parameters.fibre_pushing = parameters.bools("fibre_pushing");
+                    pC->parameters.fibre_rotation = parameters.bools("fibre_rotation");
 
                     pC->state.crosslink_point.resize(3,0.0);
 
