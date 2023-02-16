@@ -385,6 +385,7 @@ void setup_tissue( void ){
                     pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
                     pC->parameters.stuck_threshold = parameters.doubles("fibre_stuck");
                     pC->parameters.fibre_degradation = parameters.bools("fibre_degradation");
+
                     pC->state.crosslink_point.resize(3,0.0);
 
                     pC->parameters.mLength = NormalRandom(fibre_length, length_normdist_sd) / 2.0;

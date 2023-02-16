@@ -1,4 +1,0 @@
-In order to run this example 
-- Fibre degradation is switched on but we reduce the rate of fibre degradation:
-  double prob_degradation = 0.01; (second if loop of add_potentials)
-- Fibre rotation and Fibre pushing are switched off
