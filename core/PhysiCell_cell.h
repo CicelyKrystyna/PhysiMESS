@@ -114,6 +114,7 @@ class Cell_Parameters
 
     bool fibre_degradation = false; // PhysiMESS
     double fibreDegradationRate = 0.0; // PhysiMESS
+    double stuck_threshold = 0.0; // PhysiMESS
     bool fibre_rotation = false; // PhysiMESS
     bool fibre_pushing = false; // PhysiMESS
 

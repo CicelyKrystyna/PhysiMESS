@@ -1388,7 +1388,7 @@ void Cell::add_potentials(Cell* other_agent)
             naxpy(&velocity, fibre_repulsion, previous_velocity);
 
             // Fibre degradation by cell - switched on by flag fibredegradation
-            int stuck_threshold = 10;
+            int stuck_threshold = this->parameters.stuck_threshold;
             if (this->parameters.fibre_degradation && this->parameters.stuck_counter >= stuck_threshold) {
                 //std::cout << "Cell " << this->ID << " is stuck at time " << PhysiCell_globals.current_time
                           //<< " near fibre " << (*other_agent).ID  << std::endl;
@@ -1396,7 +1396,7 @@ void Cell::add_potentials(Cell* other_agent)
                 double dot_product = DotProduct(displacement, phenotype.motility.motility_vector);
                 if (dot_product >= 0) {
                     double rand_degradation = UniformRandom();
-                    double prob_degradation = parameters.fibreDegradationRate;
+                    double prob_degradation = this->parameters.fibreDegradationRate;
                     if (rand_degradation <= prob_degradation) {
                         //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                         (*other_agent).parameters.degradation_flag = true;
