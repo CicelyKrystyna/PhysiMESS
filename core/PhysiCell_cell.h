@@ -131,8 +131,9 @@ class Cell_Parameters
     int X_crosslink_count; //int T_crosslink_count; // PhysiMESS
 
     double mVelocityAdhesion = 0; // PhysiMESS
-
     double mVelocityContact = 0; // PhysiMESS
+    double mPExponent = 1.0; //PhysiMESS
+    double mQExponent = 1.0; //PhysiMESS
 
     double mCellVelocityMaximum= 0; // PhysiMESS
 	
