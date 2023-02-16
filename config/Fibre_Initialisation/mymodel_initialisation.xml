@@ -380,7 +380,7 @@
       </cell_definitions>
 	
 	<initial_conditions>
-		<cell_positions type="csv" enabled="false">
+		<cell_positions type="csv" enabled="true">
 			<folder>./config/Fibre_Initialisation</folder>
 			<filename>initialfibres.csv</filename>
 		</cell_positions>
