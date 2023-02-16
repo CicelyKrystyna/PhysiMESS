@@ -1373,8 +1373,8 @@ void Cell::add_potentials(Cell* other_agent)
             }
             cell_velocity = std::max(sqrt(cell_velocity), 1e-8);
 
-            double p_exponent = 1.;
-            double q_exponent = 1.;
+            double p_exponent = (*other_agent).parameters.mPExponent;
+            double q_exponent = (*other_agent).parameters.mQExponent;
             double xi = fabs(cell_velocity_dot_fibre_direction) / (cell_velocity);
             double xip = pow(xi, p_exponent);
             double xiq = pow((1 - xi * xi), q_exponent);
