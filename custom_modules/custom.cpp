@@ -177,6 +177,7 @@ void setup_tissue( void ){
 		(*all_cells)[i]->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
         (*all_cells)[i]->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
         (*all_cells)[i]->parameters.mVelocityContact = parameters.doubles("vel_contact");
+	(*all_cells)[i]->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
         (*all_cells)[i]->parameters.fibredegradation = parameters.bools("fibre_degradation");
         (*all_cells)[i]->state.crosslink_point.resize(3,0.0);
 
@@ -356,6 +357,7 @@ void setup_tissue( void ){
                     pC->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
+		    pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
                     pC->parameters.fibredegradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3, 0.0);
 
@@ -378,6 +380,7 @@ void setup_tissue( void ){
                     pC->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
                     pC->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
                     pC->parameters.mVelocityContact = parameters.doubles("vel_contact");
+		    pC->parameters.fibreDegradationRate = parameters.doubles("fibre_deg_rate");
                     pC->parameters.fibredegradation = parameters.bools("fibre_degradation");
                     pC->state.crosslink_point.resize(3,0.0);
 
