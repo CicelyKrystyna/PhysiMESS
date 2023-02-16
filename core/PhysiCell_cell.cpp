@@ -1396,7 +1396,7 @@ void Cell::add_potentials(Cell* other_agent)
                 double dot_product = DotProduct(displacement, phenotype.motility.motility_vector);
                 if (dot_product >= 0) {
                     double rand_degradation = UniformRandom();
-                    double prob_degradation = 0.01;
+                    double prob_degradation = parameters.fibreDegradationRate;
                     if (rand_degradation <= prob_degradation) {
                         //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                         (*other_agent).parameters.degradation_flag = true;
