@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1</max_time> 
+		<max_time units="min">1000</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -382,7 +382,7 @@
 	<initial_conditions>
 		<cell_positions type="csv" enabled="true">
 			<folder>./config/Cell_Fibre_Potentials</folder>
-			<filename>initialfibres.csv</filename>
+			<filename>fibre_maze.csv</filename>
 		</cell_positions>
 	</initial_conditions>	
 	
