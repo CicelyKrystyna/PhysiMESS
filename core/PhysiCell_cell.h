@@ -116,6 +116,7 @@ class Cell_Parameters
     double fibreDegradationRate = 0.0; // PhysiMESS
     double stuck_threshold = 0.0; // PhysiMESS
     bool fibre_rotation = false; // PhysiMESS
+    double mFibreStickiness = 1.0; //PhysiMESS
     bool fibre_pushing = false; // PhysiMESS
 
     double mLength = 0; // PhysiMESS
@@ -132,8 +133,6 @@ class Cell_Parameters
 
     double mVelocityAdhesion = 0; // PhysiMESS
     double mVelocityContact = 0; // PhysiMESS
-    double mPExponent = 1.0; //PhysiMESS
-    double mQExponent = 1.0; //PhysiMESS
 
     double mCellVelocityMaximum= 0; // PhysiMESS
 	

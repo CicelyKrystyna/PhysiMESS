@@ -263,7 +263,7 @@
           
           <secretion>
             <substrate name="substrate">
-              <secretion_rate units="1/min">20</secretion_rate>
+              <secretion_rate units="1/min">0</secretion_rate>
               <secretion_target units="substrate density">1</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0</net_export_rate>
@@ -355,7 +355,7 @@
 
           <secretion>
             <substrate name="substrate">
-              <secretion_rate units="1/min">20</secretion_rate>
+              <secretion_rate units="1/min">0</secretion_rate>
               <secretion_target units="substrate density">1</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0</net_export_rate>
@@ -431,7 +431,7 @@
           </mechanics>
 
           <motility>
-            <speed>1</speed>
+            <speed>0</speed>
             <persistence_time>1</persistence_time>
             <migration_bias>.1</migration_bias>
             <options>
@@ -496,8 +496,6 @@
         
         <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
         <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.1</vel_contact>
-        <adh_pow type="double" units="none" description="pulling factor parallel">1.0</adh_pow>
-        <rep_pow type="double" units="none" description="pulling factor orthogonal">1.0</rep_pow>
         <cell_velocity_max type="double" units="none" description="used in cell-fibre adhesion">1.0</cell_velocity_max>
         </user_parameters>
 	
