@@ -191,11 +191,13 @@ void setup_tissue( void ){
 
         const auto agentname = std::string((*all_cells)[i]->type_name);
         const auto ecm = std::string("ecm");
+        const auto matrix = std::string("matrix");
         const auto fiber = std::string("fiber");
         const auto fibre = std::string("fibre");
         const auto rod = std::string("rod");
 
         if (agentname.find(ecm) != std::string::npos ||
+            agentname.find(matrix) != std::string::npos ||
             agentname.find(fiber) != std::string::npos ||
             agentname.find(fibre) != std::string::npos ||
             agentname.find(rod) != std::string::npos) {
@@ -347,12 +349,15 @@ void setup_tissue( void ){
 
             const auto agentname = std::string(pCD->name);
             const auto ecm = std::string("ecm");
+            const auto matrix = std::string("matrix");
             const auto fiber = std::string("fiber");
             const auto fibre = std::string("fibre");
             const auto rod = std::string("rod");
 
-            if (agentname.find(fibre) == std::string::npos &&
+            if (agentname.find(ecm) == std::string::npos &&
+                agentname.find(matrix) == std::string::npos &&
                 agentname.find(fiber) == std::string::npos &&
+                agentname.find(fibre) == std::string::npos &&
                 agentname.find(rod) == std::string::npos){
                 for (int n = 0; n < parameters.ints("number_of_cells"); n++) {
 
@@ -381,6 +386,7 @@ void setup_tissue( void ){
             }
 
             if (agentname.find(ecm) != std::string::npos ||
+                agentname.find(matrix) != std::string::npos ||
                 agentname.find(fiber) != std::string::npos ||
                 agentname.find(fibre) != std::string::npos ||
                 agentname.find(rod) != std::string::npos){
