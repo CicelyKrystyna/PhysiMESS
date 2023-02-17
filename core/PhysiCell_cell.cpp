@@ -1373,8 +1373,8 @@ void Cell::add_potentials(Cell* other_agent)
             }
             cell_velocity = std::max(sqrt(cell_velocity), 1e-8);
 
-            double p_exponent = (*other_agent).parameters.mPExponent;
-            double q_exponent = (*other_agent).parameters.mQExponent;
+            double p_exponent = 1.0;
+            double q_exponent = 1.0;
             double xi = fabs(cell_velocity_dot_fibre_direction) / (cell_velocity);
             double xip = pow(xi, p_exponent);
             double xiq = pow((1 - xi * xi), q_exponent);
@@ -1437,7 +1437,7 @@ void Cell::add_potentials(Cell* other_agent)
             if (this->parameters.X_crosslink_count == 0) {
 
                 // cell-fibre pushing only if fibre un-crosslinked
-                if (this->parameters.fibre_pushing) {
+                if ((*other_agent).parameters.fibre_pushing) {
                     // as per PhysiCell
                     static double simple_pressure_scale = 0.027288820670331;
 
@@ -1460,8 +1460,8 @@ void Cell::add_potentials(Cell* other_agent)
                     naxpy(&velocity, temp_r, displacement);
                 }
 
-                // independent fibre rotation
-                if (this->parameters.fibre_rotation) {
+                // independent fibre rotation 2D!!!
+                if ((*other_agent).parameters.fibre_rotation) {
                     std::vector<double> old_orientation(3, 0.0);
                     for (int i = 0; i < 2; i++) {
                         old_orientation[i] = this->state.orientation[i];
@@ -1469,7 +1469,7 @@ void Cell::add_potentials(Cell* other_agent)
 
                     double moment_arm_magnitude = sqrt(
                             point_of_impact[0] * point_of_impact[0] + point_of_impact[1] * point_of_impact[1]);
-                    double impulse = (*other_agent).phenotype.motility.migration_speed * moment_arm_magnitude;
+                    double impulse = this->parameters.mFibreStickiness*(*other_agent).phenotype.motility.migration_speed * moment_arm_magnitude;
                     double fibre_length = 2 * this->parameters.mLength;
                     double angular_velocity = impulse / (0.5 * fibre_length * fibre_length);
                     double angle = angular_velocity;
@@ -1480,7 +1480,7 @@ void Cell::add_potentials(Cell* other_agent)
             }
 
             // fibre rotation around other fibre
-            if (this->parameters.fibre_rotation && this->parameters.X_crosslink_count == 1) {
+            if ((*other_agent).parameters.fibre_rotation && this->parameters.X_crosslink_count == 1) {
                 int index = 0;
                 /*if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
                  while (this->state.crosslinkers[index] != other_agent) {
