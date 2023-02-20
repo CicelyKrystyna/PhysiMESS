@@ -5,8 +5,9 @@ Fibre tracking Example
 ===============================================================================================
 For this example we observe cells tracking along fibres 
 - Fibre Degradation switched off
-- In the second add_potentials if loop between a cell and a fibre
-- Everything in the third add_potentials if loop between a fibre and a cell is commented
+- Fibre Pushing switched off
+- Fibre Rotation switched off 
+- Found in the second add_potentials if loop between a cell and a fibre
 - You can play about with the adhesion and repulsion strengths in the xml:
   <vel_adhesion>0.6</vel_adhesion>
   <vel_contact>0.001</vel_contact>
@@ -18,33 +19,21 @@ Snow Plough Example
 ===============================================================================================
 For this example we observe cells pushing fibres providing those fibres have no cross-links
 - Fibre Degradation switched off
-- In the third add_potentials if loop between a fibre and a cell
-- The following should be uncommented and ensure crosslink count set to >=1
-  if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 1) 
-  { return;}
-- uncomment between 
-  /* for snow plough example uncomment from here: */ 
-  and 
-  /* for snow plough example uncomment to here: */
+- Fibre Pushing switched on
+- Fibre Rotation switched off 
+- Found in the third add_potentials if loop between a fibre and a cell
+
 ===============================================================================================
 
 ===============================================================================================
 Hinge Example
 ===============================================================================================
-For this example we observe cells both snow ploughing non-crosslinks fibres but also rotating 
-singularly crosslinked fibres at a hinge. Note that this is the very early stages of implementing the Physics so it's beyond basic. Indeed the rotation currently has nothing to do with physics.
+For this example we observe cells both freely rotate non-crosslinked fibres about their centre but also rotating singularly crosslinked fibres at a hinge (the crosslink point). 
 - Fibre Degradation switched off
-- In the third add_potentials if loop between a fibre and a cell
-- The following should be uncommented and ensure crosslink count set to >=2
-  if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) 
-  { return;}
-- uncomment both between 
-  /* for snow plough example uncomment from here: */ 
-  and 
-  /* for snow plough example uncomment to here: */
-  and 
-  /* for hinge example uncomment from here: */ 
-  and 
-  /* for hinge example uncomment to here: */
+- Fibre Pushing switched off
+- Fibre Rotation switched on
+- Found in the third add_potentials if loop between a fibre and a cell
+- You can play about with the stickiness of fibres in the xml (one being free movement):
+  <fibre_sticky>1.0</fibre_sticky>
 
 ===============================================================================================

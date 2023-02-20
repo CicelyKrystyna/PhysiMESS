@@ -1213,6 +1213,11 @@ void add_crosslinks( Cell* pCell) {
     }
 }
 
+/*std::vector<double> Cell::single_fibre_crosslink_point(Cell *fibre_agent, Cell *fibre_neighbour,
+                                                     std::vector<double> &crosslink) {
+
+}*/
+
 void Cell::add_potentials(Cell* other_agent)
 {
     // no interactions with self
@@ -1410,7 +1415,6 @@ void Cell::add_potentials(Cell* other_agent)
 
     // fibre-type agent interacting with a cell-type agent
     else if (this->type_name == "fibre" && (*other_agent).type_name != "fibre") {
-
         /* note fibres only get pushed by motile cells and if they have no crosslinks */
         /*if (!other_agent->phenotype.motility.is_motile || this->parameters.X_crosslink_count >= 2) {
             return;
@@ -1476,10 +1480,11 @@ void Cell::add_potentials(Cell* other_agent)
                     this->state.orientation[0] = old_orientation[0] * cos(angle) - old_orientation[1] * sin(angle);
                     this->state.orientation[1] = old_orientation[0] * sin(angle) + old_orientation[1] * cos(angle);
                     normalize(&this->state.orientation);
+                    //std::cout << "At time " << PhysiCell_globals.current_time << " centre of fibre is " << this->position << std::endl;
                 }
             }
 
-            // fibre rotation around other fibre
+            // fibre rotation around other fibre 2D only and fibres intersect fully!!!
             if ((*other_agent).parameters.fibre_rotation && this->parameters.X_crosslink_count == 1) {
                 int index = 0;
                 /*if (std::find(this->state.crosslinkers.begin(), this->state.crosslinkers.end(), other_agent) != this->state.crosslinkers.end()) {
@@ -1487,32 +1492,82 @@ void Cell::add_potentials(Cell* other_agent)
                    index++;
                  }
                 }*/
-                //std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
+                std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
 
-                // ONLY IN 2D FOR NOW
-                double theta = 0.01;
+                // fibre endpoints
+                std::vector<double> point1(3, 0.0);
+                std::vector<double> point2(3, 0.0);
+                std::vector<double> point3(3, 0.0);
+                std::vector<double> point4(3, 0.0);
+                for (int i = 0; i < 3; i++) {
+                    // endpoints of "this" fibre
+                    point1[i] = this->position[i]
+                                - this->parameters.mLength * this->state.orientation[i];
+                    point2[i] = this->position[i]
+                                + this->parameters.mLength * this->state.orientation[i];
+                    // endpoints of "neighbor" fibre
+                    point3[i] = this->state.crosslinkers[index]->position[i]
+                                - this->state.crosslinkers[index]->parameters.mLength * this->state.crosslinkers[index]->state.orientation[i];
+                    point4[i] = this->state.crosslinkers[index]->position[i]
+                                + this->state.crosslinkers[index]->parameters.mLength * this->state.crosslinkers[index]->state.orientation[i];
+                }
+
+                //vectors between fibre endpoints
+                std::vector<double> p1_to_p2(3, 0.0);
+                std::vector<double> p3_to_p4(3, 0.0);
+                std::vector<double> p1_to_p3(3, 0.0);
+                std::vector<double> centre_to_centre(3, 0.0);
+                for (int i = 0; i < 3; i++) {
+                    // "this" fibre vector
+                    p1_to_p2[i] = point2[i] - point1[i];
+                    // "neighbor" fibre vector
+                    p3_to_p4[i] = point4[i] - point3[i];
+                    // vector from "this" to "neighbor"
+                    p1_to_p3[i] = point3[i] - point1[i];
+                    // vector between fibre centres
+                }
+                double a = DotProduct(p1_to_p2, p1_to_p3) / DotProduct(p1_to_p2, p1_to_p2);
+                double b = DotProduct(p1_to_p2, p3_to_p4) / DotProduct(p1_to_p2, p1_to_p2);
+                std::vector<double> c(3, 0.0);
+                std::vector<double> n(3, 0.0);
+                for (int i = 0; i < 3; i++) {
+                    c[i] = b * p1_to_p2[i] - p3_to_p4[i];
+                    n[i] = p1_to_p3[i] - a * p1_to_p2[i];
+                }
+                double t_2 = DotProduct(c, n) / DotProduct(c, c);
+                double t_1 = a + b * t_2;
                 double distance_fibre_centre_to_crosslink = 0.0;
-                nearest_point_on_fibre(this->position, this->state.crosslinkers[index], displacement);
                 std::vector<double> crosslink_point(3, 0.0);
-                std::vector<double> old_orientation(3, 0.0);
+                std::vector<double> fibre_centre_to_crosslink(3, 0.0);
                 for (int i = 0; i < 2; i++) {
-                    crosslink_point[i] = this->position[i] - displacement[i];
-                    distance_fibre_centre_to_crosslink += displacement[i] * displacement[i];
-                    old_orientation[i] = this->state.orientation[i];
+                    crosslink_point[i] = point1[i] + t_1*p1_to_p2[i];
+                    fibre_centre_to_crosslink[i] = crosslink_point[i]-this->position[i];
+                    distance_fibre_centre_to_crosslink += fibre_centre_to_crosslink[i]*fibre_centre_to_crosslink[i];
                 }
                 distance_fibre_centre_to_crosslink = sqrt(distance_fibre_centre_to_crosslink);
-                //std::cout << " the crosslink point is " << point[0] << " " << point[1] << " " << point[2] << std::endl;
-                //std::cout << " the displacement between " << this->type_name << " and this point is " << displacement[0] << " " << displacement[1] << " " << displacement[2] << std::endl;
-                //std::cout << " the distance is " << distance_centre_to_crosslink << std::endl;
-                //std::cout << cos(theta) << " " << sin(theta) << std::endl;
-                //this->state.orientation[0] = old_orientation[0] * cos(theta) - old_orientation[1] * sin(theta);
-                //this->state.orientation[1] = old_orientation[0] * sin(theta) + old_orientation[1] * cos(theta);
-                //normalize(&this->state.orientation);
-                //this->position[0] = point[0] + distance_centre_to_crosslink*state.orientation[0];
-                        //cos(angle) * (this->position[0] - point[0]) - sin(angle) * (this->position[1] - point[1]) + point[0];
-                //this->position[1] = point[1] + distance_centre_to_crosslink*state.orientation[1];
-                        //sin(angle) * (this->position[0] - point[0]) + cos(angle) * (this->position[1] - point[1]) + point[1];
-                //std::cout << state.orientation[0] << " " << state.orientation[1] << " " << state.orientation[2] << std::endl;*/
+
+                std::vector<double> old_orientation(3, 0.0);
+                std::vector<double> old_position(3, 0.0);
+                for (int i = 0; i < 2; i++) {
+                    old_orientation[i] = this->state.orientation[i];
+                    old_position[i] = this->position[i];
+                }
+                //std::cout << "At time " << PhysiCell_globals.current_time << " centre of fibre is " << this->position << std::endl;
+                //std::cout << " the crosslink point is " << crosslink_point << std::endl;
+                //std::cout << " the displacement vector between " << this->type_name << " " << this->ID << " centre and this point is " << fibre_centre_to_crosslink << std::endl;
+                //std::cout << " the distance between fibre centre and crosslink is " << distance_fibre_centre_to_crosslink << std::endl;
+                //std::cout << " point of impact by " << (*other_agent).type_name << " " << (*other_agent).ID << " is " << point_of_impact << std::endl;
+                double moment_arm_magnitude = sqrt(
+                        point_of_impact[0] * point_of_impact[0] + point_of_impact[1] * point_of_impact[1]);
+                double impulse = this->parameters.mFibreStickiness*(*other_agent).phenotype.motility.migration_speed * moment_arm_magnitude;
+                double fibre_length = 2 * this->parameters.mLength;
+                double angular_velocity = impulse / (0.5 * fibre_length * fibre_length);
+                double angle = angular_velocity;
+                this->state.orientation[0] = old_orientation[0] * cos(angle) - old_orientation[1] * sin(angle);
+                this->state.orientation[1] = old_orientation[0] * sin(angle) + old_orientation[1] * cos(angle);
+                normalize(&this->state.orientation);
+                this->position[0] = crosslink_point[0]-distance_fibre_centre_to_crosslink*state.orientation[0];
+                this->position[1] = crosslink_point[1]-distance_fibre_centre_to_crosslink*state.orientation[1];
             }
         }
 
