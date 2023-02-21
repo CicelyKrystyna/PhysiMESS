@@ -1385,7 +1385,7 @@ void Cell::add_potentials(Cell* other_agent)
             double xiq = pow((1 - xi * xi), q_exponent);
 
             fibre_adhesion = (*other_agent).parameters.mVelocityAdhesion * xip *
-                             (1 - cell_velocity / this->parameters.mCellVelocityMaximum);
+                    (1 - cell_velocity / this->parameters.mCellVelocityMaximum);
 
             fibre_repulsion = (*other_agent).parameters.mVelocityContact * xiq;
 
@@ -1492,7 +1492,7 @@ void Cell::add_potentials(Cell* other_agent)
                    index++;
                  }
                 }*/
-                std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
+                //std::cout << this->type_name << " " << this->ID << " cross links with " << this->state.crosslinkers[index]->ID << std::endl;
 
                 // fibre endpoints
                 std::vector<double> point1(3, 0.0);
