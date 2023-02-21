@@ -1,9 +1,9 @@
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
+		<x_min>-400</x_min>
+		<x_max>400</x_max>
+		<y_min>-400</y_min>
+		<y_max>400</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -50,18 +50,9 @@
 	</options>	
 
 	<microenvironment_setup>
-		<variable name="substrate" units="dimensionless" ID="0">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
-          <decay_rate units="1/min">0.1</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">1</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
-      </variable>
-
       <variable name="nutrient" units="dimensionless" ID="1">
         <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+          <diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">1</initial_condition>
@@ -162,12 +153,6 @@
           </motility>
 
           <secretion>
-            <substrate name="substrate">
-              <secretion_rate units="1/min">1</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
             <substrate name="nutrient">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
@@ -236,9 +221,9 @@
           </volume>
 
           <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.0</cell_cell_adhesion_strength>
+            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">5.0</relative_maximum_adhesion_distance>
+            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -262,8 +247,8 @@
           
           
           <secretion>
-            <substrate name="substrate">
-              <secretion_rate units="1/min">20</secretion_rate>
+            <substrate name="nutrient">
+              <secretion_rate units="1/min">0</secretion_rate>
               <secretion_target units="substrate density">1</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0</net_export_rate>
@@ -354,12 +339,6 @@
           </motility>
 
           <secretion>
-            <substrate name="substrate">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
             <substrate name="nutrient">
               <secretion_rate units="1/min">10.0</secretion_rate>
               <secretion_target units="substrate density">1</secretion_target>
@@ -399,11 +378,11 @@
         
         <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
          <fibre_deg_rate type="double" units="none" description="rate of fibre degradation">0.01</fibre_deg_rate>
-        <fibre_stuck type="double" units="none" description="how long to wait before considered stuck">10</fibre_stuck>
+        <fibre_stuck type="double" units="none" description="how long to wait before considered stuck">10.0</fibre_stuck>
         
-         <fibre_pushing type="bool" units="none" description="flag for fibre degradation">true</fibre_pushing>
+         <fibre_pushing type="bool" units="none" description="flag for fibre pushing">false</fibre_pushing>
          <fibre_sticky type="double" units="none" description="how easy is it to move fibre">1.0</fibre_sticky>
-         <fibre_rotation type="bool" units="none" description="flag for fibre degradation">false</fibre_rotation>
+         <fibre_rotation type="bool" units="none" description="flag for fibre rotation">false</fibre_rotation>
         
         <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.1</vel_adhesion>
         <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.1</vel_contact>

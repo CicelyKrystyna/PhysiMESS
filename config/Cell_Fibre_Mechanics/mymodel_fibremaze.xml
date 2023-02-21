@@ -446,7 +446,7 @@
 	
 	<initial_conditions>
 		<cell_positions type="csv" enabled="true">
-			<folder>./config/PACMAN/</folder>
+			<folder>./config/Cell_Fibre_Mechanics/</folder>
 			<filename>fibre_maze.csv</filename>
 		</cell_positions>
 	</initial_conditions>	
@@ -467,7 +467,7 @@
         <fibre_pushing type="bool" units="none" description="flag for fibre pushing">false</fibre_pushing>
         <fibre_sticky type="double" units="none" description="measure of how easy it is to move a fibre">1.0</fibre_sticky>
         <fibre_rotation type="bool" units="none" description="flag for fibre rotation">false</fibre_rotation>
-        <vel_adhesion type="double" units="" description="cell velocity parallel to fibre">0.06</vel_adhesion>
+        <vel_adhesion type="double" units="" description="cell velocity parallel to fibre">0.6</vel_adhesion>
         <vel_contact type="double" units="" description="cell velocity orthogonal to fibre">0.1</vel_contact>
         <cell_velocity_max type="double" units="" description="max cell velocity">1.0</cell_velocity_max>
         </user_parameters>
