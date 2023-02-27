@@ -325,7 +325,6 @@ void setup_tissue( void ){
             }
 
             // relabel so that the rest of the code works (HACK)
-            // or we could possibly use string find throughout code instead?!
             (*all_cells)[i]->type_name = "fibre";
 
         }

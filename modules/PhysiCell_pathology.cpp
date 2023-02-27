@@ -554,17 +554,13 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 			// figure out how much of the cell intersects with z = 0
 			double plot_radius = sqrt( r*r - z*z );
 
-            // place a rod if it's a fibre
+            // place a rod if it's a fibre (note fibre already renamed here)
             const auto agentname = std::string(pC->type_name);
             const auto fibre = std::string("fibre");
-            const auto fiber = std::string("fiber");
-            const auto rod = std::string("rod");
 
-            if (agentname.find(fibre) != std::string::npos ||
-                agentname.find(fiber) != std::string::npos ||
-                agentname.find(rod) != std::string::npos){
+            if (agentname.find(fibre) != std::string::npos ){
 
-                int crosslinks = pC->parameters.X_crosslink_count; //+ pC->parameters.T_crosslink_count;
+                int crosslinks = pC->parameters.X_crosslink_count;
                 if (crosslinks >= 3){
                     // if fibre has cross-links different colour than if not
                     Write_SVG_line(os, (pC->position)[0] - (pC->parameters.mLength) * (pC->state.orientation)[0] - X_lower,
@@ -786,32 +782,21 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 		// get the colors using the current coloring function 
 		std::vector<std::string> colors = cell_coloring_function(&C);
 
-        // place a rod if it's a fibre
+        // place a rod if it's a fibre (note fibre not yet renamed)
         const auto agentname = std::string(C.type_name);
-        const auto fibre = std::string("fibre");
+        const auto ecm = std::string("ecm");
+        const auto matrix = std::string("matrix");
         const auto fiber = std::string("fiber");
+        const auto fibre = std::string("fibre");
         const auto rod = std::string("rod");
 
-        if (agentname.find(fibre) != std::string::npos ||
+        if (agentname.find(ecm) != std::string::npos ||
+            agentname.find(matrix) != std::string::npos ||
             agentname.find(fiber) != std::string::npos ||
-            agentname.find(rod) != std::string::npos){
-            //###########################################//
-            //   this bit a hack for PacMan and maze	 //
-            //###########################################//
-            if(C.type_name == "fibre_vertical")
-            {
-                Write_SVG_line(os, cursor_x, cursor_y-20.0 , cursor_x , cursor_y+20.0 , 4.0 , colors[0] );
-            }
-            else if(C.type_name == "fibre_horizontal")
-            {
-                Write_SVG_line(os, cursor_x, cursor_y-20.0 , cursor_x , cursor_y+20.0 , 4.0 , colors[0] );
-            }
-                //###########################################//
-            else
-            {
+            agentname.find(fibre) != std::string::npos ||
+            agentname.find(rod) != std::string::npos) {
                 //Write_SVG_fibre(os, cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[1] , colors[0] );
                 Write_SVG_line(os, cursor_x, cursor_y-20.0 , cursor_x , cursor_y+20.0 , 4.0 , "lightskyblue" );
-            }
         }
         else {
             // place a big circle with cytoplasm colors
