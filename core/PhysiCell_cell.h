@@ -78,7 +78,10 @@
 #include "../modules/PhysiCell_settings.h" 
 
 #include "./PhysiCell_standard_models.h"
+
+// !!! PHYSIMESS CODE BLOCK START !!! //
 #include <list>
+// !!! PHYSIMESS CODE BLOCK END !!! //
 
 using namespace BioFVM; 
 
@@ -112,29 +115,29 @@ class Cell_Parameters
 	double max_necrosis_rate; // deprecate
 	int necrosis_type; // deprecate
 
-    bool fibre_degradation = false; // PhysiMESS
-    double fibreDegradationRate = 0.0; // PhysiMESS
-    double stuck_threshold = 0.0; // PhysiMESS
-    bool fibre_rotation = false; // PhysiMESS
-    double mFibreStickiness = 1.0; //PhysiMESS
-    bool fibre_pushing = false; // PhysiMESS
+    // !!! PHYSIMESS CODE BLOCK START !!! //
+    double mLength = 0;
+    double mRadius = 0;
 
-    double mLength = 0; // PhysiMESS
-    double mRadius = 0; // PhysiMESS
+    int fail_count = 0;
 
-    int fail_count = 0; // PhysiMESS
+    double stuck_counter = 0;
+    double unstuck_counter = 0;
 
-    double stuck_counter = 0; // PhysiMESS
-    double unstuck_counter = 0; // PhysiMESS
+    bool degradation_flag = false;
+    bool fibre_degradation = false;
+    double fibreDegradationRate = 0.0;
+    double stuck_threshold = 0.0;
+    bool fibre_rotation = false;
+    double mFibreStickiness = 1.0;
+    bool fibre_pushing = false;
 
-    bool degradation_flag = false; // PhysiMESS
+    int X_crosslink_count;
 
-    int X_crosslink_count; //int T_crosslink_count; // PhysiMESS
-
-    double mVelocityAdhesion = 0; // PhysiMESS
-    double mVelocityContact = 0; // PhysiMESS
-
-    double mCellVelocityMaximum= 0; // PhysiMESS
+    double mVelocityAdhesion = 0;
+    double mVelocityContact = 0;
+    double mCellVelocityMaximum= 0;
+    // !!! PHYSIMESS CODE BLOCK END !!! //
 	
 	Cell_Parameters(); 
 }; 
@@ -169,7 +172,10 @@ class Cell_State
 	std::vector<Cell*> attached_cells; 
 
 	std::vector<Cell*> neighbors;
-    std::vector<Cell*> crosslinkers; // PhysiMess
+    // !!! PHYSIMESS CODE BLOCK START !!! //
+    std::vector<Cell*> crosslinkers;
+    std::vector<double> crosslink_point;
+    // !!! PHYSIMESS CODE BLOCK START !!! //
 	std::vector<double> orientation;
 	
 	double simple_pressure; 
@@ -180,9 +186,7 @@ class Cell_State
 	
 	double damage; 
 	double total_attack_time; 
-	bool contact_with_basement_membrane; // not implemented yet
-
-    std::vector<double> crosslink_point; // PhysiMess
+	bool contact_with_basement_membrane; // not implemented yet 
 	
 	Cell_State(); 
 };
@@ -202,16 +206,12 @@ class Cell : public Basic_Agent
 	Cell_Functions functions; 
 
 	Cell_State state; 
-	Phenotype phenotype;
-
-    void force_update_motility_vector(double dt_); // PhysiMESS
+	Phenotype phenotype; 
+	
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
 	
 	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
-    void check_fibre_crosslinks(Cell*); // PhysiMESS for use in fibre crosslink models
-    void degrade_fibre(Cell*); // PhysiMESS for use in fibre degradation models
-    std::vector<double> nearest_point_on_fibre(std::vector<double> point, Cell* , std::vector<double>& displacement); // PhysiMESS
 	void set_previous_velocity(double xV, double yV, double zV);
 	int get_current_mechanics_voxel_index();
 	void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
@@ -251,11 +251,8 @@ class Cell : public Basic_Agent
 								// otherwise, it assigns a random orientation to the cell.
 	
 	void copy_function_pointers(Cell*);
-
-    std::vector<double> CrossProduct(std::vector<double> vector_A, std::vector<double> vector_B, std::vector<double>& C_P); // PhysiMESS vector function to find cross products
-    double DotProduct(std::vector<double> vector_A, std::vector<double> vector_B); // PhysiMESS vector function to find dot products
-
-    void update_voxel_in_container(void);
+	
+	void update_voxel_in_container(void);
 	void copy_data(Cell *);
 	
 	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
@@ -277,7 +274,16 @@ class Cell : public Basic_Agent
 	std::vector<Cell*> nearby_cells( void ); // new in 1.8.0 
 	std::vector<Cell*> nearby_interacting_cells( void ); // new in 1.8.0 
 	
-	void convert_to_cell_definition( Cell_Definition& cd ); 
+	void convert_to_cell_definition( Cell_Definition& cd );
+
+    // !!! PHYSIMESS CODE BLOCK START !!! //
+    void force_update_motility_vector(double dt_);
+    void check_fibre_crosslinks(Cell*);
+    void degrade_fibre(Cell*);
+    std::vector<double> nearest_point_on_fibre(std::vector<double> point, Cell* , std::vector<double>& displacement);
+    std::vector<double> CrossProduct(std::vector<double> vector_A, std::vector<double> vector_B, std::vector<double>& C_P);
+    double DotProduct(std::vector<double> vector_A, std::vector<double> vector_B);
+    // !!! PHYSIMESS CODE BLOCK END !!! //
 };
 
 Cell* create_cell( void );  
@@ -324,11 +330,13 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0
 std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell ); // new in 1.8.0
 
-std::list<int> register_fibre_voxels( Cell* pCell ); // PhysiMESS
-void deregister_fibre_voxels( Cell* pCell ); // PhysiMESS
-std::list<int> find_agent_voxels(Cell * pCell ); // PhysiMESS
-void find_agent_neighbors( Cell* pCell ); // PhysiMESS
-void add_crosslinks( Cell* pCell ); // PhysiMESS
+// !!! PHYSIMESS CODE BLOCK START !!! //
+std::list<int> register_fibre_voxels( Cell* pCell );
+void deregister_fibre_voxels( Cell* pCell );
+std::list<int> find_agent_voxels(Cell * pCell );
+void find_agent_neighbors( Cell* pCell );
+void add_crosslinks( Cell* pCell );
+// !!! PHYSIMESS CODE BLOCK END !!! //
 
 };
 

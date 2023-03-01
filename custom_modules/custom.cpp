@@ -66,25 +66,18 @@
 */
 
 #include "./custom.h"
-#include <math.h>  
-#include <chrono>
-#include <random>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <algorithm>
 
-
-void create_cell_types( void ){
+void create_cell_types( void )
+{
 	// set the random seed 
 	SeedRandom( parameters.ints("random_seed") );  
 	
 	/* 
 	   Put any modifications to default cell definition here if you 
 	   want to have "inherited" by other cell types. 
-
+	   
 	   This is a good place to set default functions. 
-	*/
+	*/ 
 	
 	initialize_default_cell_definition(); 
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
@@ -98,37 +91,47 @@ void create_cell_types( void ){
 	cell_defaults.functions.contact_function = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
-	cell_defaults.functions.calculate_distance_to_membrane = NULL;
-
-    cell_defaults.functions.custom_cell_rule = custom_function;
-
-    /*
-       This parses the cell definitions in the XML config file.
-    */
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
 	initialize_cell_definitions_from_pugixml(); 
-	
+
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
+
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
+
+	setup_signal_behavior_dictionaries(); 	
+
 	/* 
 	   Put any modifications to individual cell definitions here. 
 	   
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	cell_defaults.functions.update_phenotype = phenotype_function;
-    //cell_defaults.functions.custom_cell_rule = custom_function;
-    cell_defaults.functions.contact_function = contact_function;
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.custom_cell_rule = custom_function; 
+	cell_defaults.functions.contact_function = contact_function; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
 		
-	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 	
 	return; 
 }
 
-void setup_microenvironment( void ){
+void setup_microenvironment( void )
+{
 	// set domain parameters 
 	
 	// put any custom code to set non-homogeneous initial conditions or 
@@ -141,7 +144,8 @@ void setup_microenvironment( void ){
 	return; 
 }
 
-void setup_tissue( void ){
+void setup_tissue( void )
+{
 	double Xmin = microenvironment.mesh.bounding_box[0]; 
 	double Ymin = microenvironment.mesh.bounding_box[1]; 
 	double Zmin = microenvironment.mesh.bounding_box[2]; 
@@ -150,17 +154,19 @@ void setup_tissue( void ){
 	double Ymax = microenvironment.mesh.bounding_box[4]; 
 	double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	if(default_microenvironment_options.simulate_2D){
+	if( default_microenvironment_options.simulate_2D == true )
+	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
 	}
 	
 	double Xrange = Xmax - Xmin; 
 	double Yrange = Ymax - Ymin; 
-	double Zrange = Zmax - Zmin; 
+	double Zrange = Zmax - Zmin;
 
-	// load cells from your CSV file (if enabled)
-	load_cells_from_pugixml();
+    // !!! PHYSIMESS CODE BLOCK START !!! //
+    // load cells from your CSV file (if enabled)
+    load_cells_from_pugixml();
 
     // new fibre related parameters and bools
     bool isFibreFromFile = false;
@@ -171,10 +177,10 @@ void setup_tissue( void ){
     double fibre_angle = parameters.doubles("fibre_angle");
     double angle_normdist_sd = parameters.doubles("angle_normdist_sd");
 
-	for( int i=0; i < (*all_cells).size(); i++ ){
+    for( int i=0; i < (*all_cells).size(); i++ ){
 
         // initialise the following parameters for all cells regardless of type
-		(*all_cells)[i]->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
+        (*all_cells)[i]->parameters.mCellVelocityMaximum = parameters.doubles("cell_velocity_max");
         (*all_cells)[i]->parameters.mVelocityAdhesion = parameters.doubles("vel_adhesion");
         (*all_cells)[i]->parameters.mVelocityContact = parameters.doubles("vel_contact");
 
@@ -272,7 +278,7 @@ void setup_tissue( void ){
             if (fibreanisotropy) {
                 if (xs < Xmin || xe > Xmax || xe < Xmin || xs > Xmax ||
                     ys < Ymin || ye > Ymax || ye < Ymin || ys > Ymax) {
-                        (*all_cells)[i]->parameters.fail_count = 10;
+                    (*all_cells)[i]->parameters.fail_count = 10;
                 }
             }
             else{
@@ -329,23 +335,23 @@ void setup_tissue( void ){
 
         }
         else
-		{
-			// type is a normal cell
-		}
-	}
+        {
+            // type is a normal cell
+        }
+    }
 
     /* agents have not been added from the file but do want them
        create some of each agent type */
 
-	if(!isFibreFromFile){
-		Cell* pC;
-		std::vector<double> position = {0, 0, 0};
+    if(!isFibreFromFile){
+        Cell* pC;
+        std::vector<double> position = {0, 0, 0};
 
-		for( int k=0; k < cell_definitions_by_index.size() ; k++ ) {
+        for( int k=0; k < cell_definitions_by_index.size() ; k++ ) {
 
             Cell_Definition *pCD = cell_definitions_by_index[k];
             std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl;
-
+            
             const auto agentname = std::string(pCD->name);
             const auto ecm = std::string("ecm");
             const auto matrix = std::string("matrix");
@@ -509,20 +515,21 @@ void setup_tissue( void ){
                     pC->type_name = "fibre";
 
                 }
-			}
+            }
 
-		}
+        }
 
-	}
+    }
 
     int number_of_agents = (*all_cells).size();
     for( int i=0; i < number_of_agents; i++ ){
         if ((*all_cells)[i]->parameters.fail_count >= 10) {
             std::cout << "I failed to place " << (*all_cells)[i]->type_name << " " <<
-                          (*all_cells)[i]->ID << " in the domain - I am deleting agent " << std::endl;
+                      (*all_cells)[i]->ID << " in the domain - I am deleting agent " << std::endl;
             delete_cell((*all_cells)[i]);
         }
     }
+    // !!! PHYSIMESS CODE BLOCK END !!! //
 
     std::cout << std::endl;
 }
@@ -534,7 +541,7 @@ void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
-{ return; }
+{ return; } 
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
-{ return; }
+{ return; } 

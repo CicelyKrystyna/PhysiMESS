@@ -76,11 +76,10 @@ using namespace PhysiCell;
 void create_cell_types( void );
 void setup_tissue( void ); 
 
-// set up the BioFVM microenvironment
-
+// set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
 
-// custom pathology coloring function
+// custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
 
@@ -88,4 +87,6 @@ std::vector<std::string> my_coloring_function( Cell* );
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
-void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt );
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+

@@ -139,6 +139,23 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 	static double phenotype_dt_tolerance = 0.001 * phenotype_dt_; 
 	static double mechanics_dt_tolerance = 0.001 * mechanics_dt_; 
 	
+	// intracellular update. called for every diffusion_dt, but actually depends on the intracellular_dt of each cell (as it can be noisy)
+
+	#pragma omp parallel for 
+	for( int i=0; i < (*all_cells).size(); i++ )
+	{
+		if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
+		{
+			if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
+				(*all_cells)[i]->functions.pre_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+
+			(*all_cells)[i]->phenotype.intracellular->update( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+
+			if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
+				(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+		}
+	}
+	
 	if( fabs(time_since_last_cycle-phenotype_dt_ ) < phenotype_dt_tolerance || !initialzed)
 	{
 		// Reset the max_radius in each voxel. It will be filled in set_total_volume
@@ -202,16 +219,15 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			if( pC->functions.contact_function && pC->is_out_of_domain == false )
 			{ evaluate_interactions( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
-		
-		// perform custom computations
 
-        #pragma omp parallel for
+        // !!! PHYSIMESS CODE BLOCK START !!! //
+       #pragma omp parallel for
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
             if( !pC->is_out_of_domain )
             {
-                register_fibre_voxels(pC); //new for PhysiMess
+                register_fibre_voxels(pC);
             }
         }
 
@@ -223,7 +239,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
             pC->state.crosslinkers.clear();
             if( !pC->is_out_of_domain )
             {
-                find_agent_neighbors(pC); //new for PhysiMess
+                find_agent_neighbors(pC);
             }
         }
 
@@ -233,9 +249,12 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
             Cell* pC = (*all_cells)[i];
             if( !pC->is_out_of_domain )
             {
-                deregister_fibre_voxels(pC); //new for PhysiMess
+                deregister_fibre_voxels(pC);
             }
         }
+        // !!! PHYSIMESS CODE BLOCK END !!! //
+		
+		// perform custom computations 
 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
@@ -246,13 +265,16 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 
+        // !!! PHYSIMESS CODE BLOCK START !!! //
         // determine and add crosslinks
         #pragma omp parallel for
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
-            add_crosslinks(pC); //new for PhysiMess
+            add_crosslinks(pC);
         }
+        // !!! PHYSIMESS CODE BLOCK END !!! //
+
 		
 		// update velocities 
 		
@@ -264,6 +286,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 
+        // !!! PHYSIMESS CODE BLOCK START !!! //
         // degrade any flagged fibres
         #pragma omp parallel for
         for( int i=0; i < (*all_cells).size(); i++ )
@@ -273,6 +296,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
                 pC->degrade_fibre(pC);
             }
         }
+        // !!! PHYSIMESS CODE BLOCK END !!! //
 
 		// new March 2022: 
 		// run standard interactions (phagocytosis, attack, fusion) here 
@@ -292,8 +316,9 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			std::cout << "\t\tClearing " << cells_ready_to_die.size() << " cells ... " << std::endl; 
 			// there might be a lot of "dummy" cells ready for removal. Let's do it. 		
 			*/
-			for( int i=0; i < cells_ready_to_die.size(); i++ )
-			{ cells_ready_to_die[i]->die(); }
+			for( int i=0; i < cells_ready_to_die.size(); i++ ){
+                cells_ready_to_die[i]->die();
+            }
 			cells_ready_to_die.clear();
 		}
 		
@@ -329,7 +354,7 @@ void Cell_Container::register_agent( Cell* agent )
 
 void Cell_Container::remove_agent(Cell* agent )
 {
-    remove_agent_from_voxel(agent, agent->get_current_mechanics_voxel_index());
+	remove_agent_from_voxel(agent, agent->get_current_mechanics_voxel_index());
 	return; 
 }
 
@@ -343,18 +368,20 @@ void Cell_Container::add_agent_to_outer_voxel(Cell* agent)
 
 void Cell_Container::remove_agent_from_voxel(Cell* agent, int voxel_index)
 {
-	int delete_index = 0; 
-	while( agent_grid[voxel_index][ delete_index ] != agent )
-	{
-		delete_index++; 
-	}
+    int delete_index = 0;
+    while( agent_grid[voxel_index][ delete_index ] != agent )
+    {
+        delete_index++;
+    }
 
+    // !!! PHYSIMESS CODE BLOCK START !!! //
     // move last item to index location
     agent_grid[voxel_index][delete_index] = agent_grid[voxel_index][agent_grid[voxel_index].size()-1 ];
     // shrink the vector
-	agent_grid[voxel_index].pop_back();
-	return;
-}
+    agent_grid[voxel_index].pop_back();
+    // !!! PHYSIMESS CODE BLOCK END !!! //
+    return;
+}		
 
 void Cell_Container::add_agent_to_voxel(Cell* agent, int voxel_index)
 {
@@ -400,7 +427,7 @@ void Cell_Container::flag_cell_for_removal( Cell* pCell )
 { 
 	#pragma omp critical
 	{
-		auto result = std::find(std::begin(cells_ready_to_die), std::end(cells_ready_to_die), pCell );
+        auto result = std::find(std::begin(cells_ready_to_die), std::end(cells_ready_to_die), pCell );
 		if( result == std::end(cells_ready_to_die) )
 		{ cells_ready_to_die.push_back( pCell ); }		
 	} 
