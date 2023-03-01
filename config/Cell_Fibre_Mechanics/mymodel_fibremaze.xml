@@ -454,6 +454,7 @@
 	<user_parameters>
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
+        
         <number_of_fibres type="int" units="none" description="initial number of fibres (for each fibre type)">2000</number_of_fibres>
         <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">true</anisotropic_fibres>
         <fibre_length type="double" units="microns" description="length of fibres">60.0</fibre_length>
@@ -461,12 +462,15 @@
         <fibre_radius type="double" units="microns" description="radius of fibres">2.0</fibre_radius>
         <fibre_angle type="double" units="radians" description="angle of fibre orientation">1.57</fibre_angle>
         <angle_normdist_sd type="double" units="radians" description="standard deviation of fibre orientation angle">0.0</angle_normdist_sd>
+        
         <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
         <fibre_deg_rate type="double" units="1/min" description="fibre degradation rate">0.01</fibre_deg_rate>
         <fibre_stuck type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_stuck>
+        
         <fibre_pushing type="bool" units="none" description="flag for fibre pushing">false</fibre_pushing>
         <fibre_sticky type="double" units="none" description="measure of how easy it is to move a fibre">1.0</fibre_sticky>
         <fibre_rotation type="bool" units="none" description="flag for fibre rotation">false</fibre_rotation>
+        
         <vel_adhesion type="double" units="" description="cell velocity parallel to fibre">0.6</vel_adhesion>
         <vel_contact type="double" units="" description="cell velocity orthogonal to fibre">0.1</vel_contact>
         <cell_velocity_max type="double" units="" description="max cell velocity">1.0</cell_velocity_max>
