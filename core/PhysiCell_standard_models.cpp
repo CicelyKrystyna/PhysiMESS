@@ -620,6 +620,7 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 	
 	pCell->state.simple_pressure = 0.0;
 
+    // !!! PHYSIMESS CODE BLOCK START !!! //
     // Count crosslinks
     pCell->parameters.X_crosslink_count = 0;
     if (pCell->type_name == "fibre" && pCell->state.crosslinkers.size()  > 0){
@@ -663,7 +664,7 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
     if(pCell->parameters.unstuck_counter == unstuck_threshold+1){
         pCell->parameters.unstuck_counter = 0;
     }
-
+    // !!! PHYSIMESS CODE BLOCK END !!! //
 
     return;
 

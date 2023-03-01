@@ -528,6 +528,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	*/
  
 
+ 
 	// plot intersecting cells 
 	os << "  <g id=\"cells\">" << std::endl; 
 	for( int i=0 ; i < total_cell_count ; i++ )
@@ -554,6 +555,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 			// figure out how much of the cell intersects with z = 0
 			double plot_radius = sqrt( r*r - z*z );
 
+            // !!! PHYSIMESS CODE BLOCK START !!! //
             // place a rod if it's a fibre (note fibre already renamed here)
             const auto agentname = std::string(pC->type_name);
             const auto fibre = std::string("fibre");
@@ -607,6 +609,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
                                       plot_radius, 0.5, Colors[3],Colors[2]);
                 }
             }
+            // !!! PHYSIMESS CODE BLOCK END !!! //
 			os << "   </g>" << std::endl;
 		}
 		
@@ -766,7 +769,8 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 	
 	double total_height = number_of_cell_types * row_height; 
 	double total_width  = row_width; 
-
+	
+	
 	std::ofstream os( filename , std::ios::out );
 	Write_SVG_start( os , total_width ,total_height ); 
 	
@@ -782,6 +786,7 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 		// get the colors using the current coloring function 
 		std::vector<std::string> colors = cell_coloring_function(&C);
 
+        // !!! PHYSIMESS CODE BLOCK START !!! //
         // place a rod if it's a fibre (note fibre not yet renamed)
         const auto agentname = std::string(C.type_name);
         const auto ecm = std::string("ecm");
@@ -795,8 +800,8 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
             agentname.find(fiber) != std::string::npos ||
             agentname.find(fibre) != std::string::npos ||
             agentname.find(rod) != std::string::npos) {
-                //Write_SVG_fibre(os, cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[1] , colors[0] );
-                Write_SVG_line(os, cursor_x, cursor_y-20.0 , cursor_x , cursor_y+20.0 , 4.0 , "lightskyblue" );
+            //Write_SVG_fibre(os, cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[1] , colors[0] );
+            Write_SVG_line(os, cursor_x, cursor_y-20.0 , cursor_x , cursor_y+20.0 , 4.0 , "lightskyblue" );
         }
         else {
             // place a big circle with cytoplasm colors
@@ -804,8 +809,9 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
             // place a small circle with nuclear colors
             //Write_SVG_circle(os, cursor_x, cursor_y, 0.5 * temp_cell_radius, 1.0, colors[2], colors[3]);
         }
-		// place the label 
+        // !!! PHYSIMESS CODE BLOCK END !!! //
 		
+		// place the label
 		cursor_x += temp_cell_radius + 2*padding; 
 		cursor_y += 0.3*font_size; 
 		
