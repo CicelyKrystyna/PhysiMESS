@@ -1,16 +1,8 @@
 # PhysiMESS
 PhysiMESS (PhysiCell MicroEnvironment Structure Simulation) is a PhysiCell add-on which allows users to simulate ECM components as agents. 
 
-## Dedicated sample project
-PhysiMeSS comes with a dedicated sample project, called **physimess-sample**. To build it, go to the root directory and use : 
-
-```
-    make physimess-sample
-    make
-```
-
 ## Pre-loaded examples 
-The following example directories are populated in config directory once the **physimess-sample** project is loaded as above.
+The following example directories are populated in config directory.
 
 ### Fibre_Initialisation
 The directory Fibre_Initialisation contains simple examples in which you can initialise ECM fibres in the domain. Fibres are cylindrical agents described by their centre, radius, length and orientation. The centre of each fibre is prescribed either from a csv file or at random (as per cells in PhysiCell). The other attributes can be altered via user parameters in the xml or GUI. The following default parameters are found in ```mymodel_initialisation.xml```
